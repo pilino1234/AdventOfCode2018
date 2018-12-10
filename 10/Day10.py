@@ -1,5 +1,4 @@
 import re
-from collections import defaultdict
 from operator import itemgetter
 
 
@@ -21,28 +20,25 @@ def simulate(points: list):
             p[0] += p[2]
             p[1] += p[3]
 
-        max_y = max(points, key = itemgetter(1))[1]
-        min_y = min(points, key = itemgetter(1))[1]
+        max_y = max(points, key=itemgetter(1))[1]
+        min_y = min(points, key=itemgetter(1))[1]
 
     print_points(points)
     return seconds
 
 
 def print_points(points: list):
-    points_map = defaultdict(int)
+    points_set = set((p[0], p[1]) for p in points)
 
     max_x = max(points, key=itemgetter(0))[0]
     min_x = min(points, key=itemgetter(0))[0]
 
-    max_y = max(points, key = itemgetter(1))[1]
-    min_y = min(points, key = itemgetter(1))[1]
-
-    for p in points:
-        points_map[(p[0], p[1])] = 1
+    max_y = max(points, key=itemgetter(1))[1]
+    min_y = min(points, key=itemgetter(1))[1]
 
     for line in range(min_y, max_y + 1):
         for col in range(min_x, max_x + 1):
-            if (col, line) in points_map:
+            if (col, line) in points_set:
                 print("#", end="")
             else:
                 print(".", end="")
@@ -56,4 +52,6 @@ if __name__ == '__main__':
 
     points = parse_points(lines)
 
-    print(simulate(points))
+    seconds = simulate(points)
+
+    print("Seconds:", seconds)
