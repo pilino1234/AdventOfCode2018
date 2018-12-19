@@ -1,0 +1,129 @@
+addi 1 16 1         inc pc by 16+1  GOTO A                   PC register also points at reg1
+E: seti 1 2 5       [5] = 1
+D: seti 1 2 2       [2] = 1
+C: mulr 5 2 3       [3] = [5] * [2]
+eqrr 3 4 3          [3] = 1 if [3] == [4] else 0
+addr 3 1 1          inc pc by [3] + 1
+addi 1 1 1          inc pc by 1+1  GOTO B                   If [5] * [2] != [4], execute this line
+addr 5 0 0          [0] = [5] + [0]                         If [5] * [2] == [4], execute this line
+B: addi 2 1 2       [2] = [2] + 1                           Either way, we end up here
+gtrr 2 4 3          [3] = 1 if [2] > [4] else 0
+addr 1 3 1          inc pc by [3]+1
+seti 2 8 1          set pc = 3  GOTO C                      If [2] <= [4], execute this line
+addi 5 1 5          [5] = [5] + 1
+gtrr 5 4 3          [3] = 1 if [5] > [4] else 0
+addr 3 1 1          inc pc by [3]+1
+seti 1 1 1          set pc = 1+1  GOTO D
+mulr 1 1 1          set pc = (pc * pc) + 1                  This will end the program.
+A: addi 4 2 4       [4] = [4] + 2                           Everything down here is only called once
+mulr 4 4 4          [4] = [4] * [4]
+mulr 1 4 4          [4] = pc * [4]
+muli 4 11 4         [4] = [4] * 11
+addi 3 3 3          [3] = [3] + 3
+mulr 3 1 3          [3] = [3] * pc
+addi 3 4 3          [3] = [3] + 4
+addr 4 3 4          [4] = [4] + [3]                         [4] is set to a fairly large number
+addr 1 0 1          inc pc by [0]+1
+seti 0 0 1          set pc to 0+1  GOTO E                   In part2, this line is skipped and we continue...
+setr 1 5 3          [3] = pc
+mulr 3 1 3          [3] = [3] * pc
+addr 1 3 3          [3] = pc + [3]
+mulr 1 3 3          [3] = pc * [3]
+muli 3 14 3         [3] = [3] * 14
+mulr 3 1 3          [3] = [3] * pc
+addr 4 3 4          [4] = [4] + [3]                         Now, 4 is an even larger number
+seti 0 0 0          [0] = 0                                 Reset 0
+seti 0 1 1          set pc to 0+1  GOTO E                   Now we start the real program
+
+----------------------------------------------------------------------------------
+
+inc pc by 16+1  GOTO A                goto A;
+E: [5] = 1                            [5] = 1;
+D: [2] = 1                            [2] = 1;
+C: [3] = [5] * [2]                                                   /
+[3] = 1 if [3] == [4] else 0                                         /
+inc pc by [3] + 1                     if ([5] * [2]) == [4] {        /
+inc pc by 1+1  GOTO B                     [0] += [5];                /
+[0] = [5] + [0]                       }                              /
+B: [2] = [2] + 1                      [2] += 1;
+[3] = 1 if [2] > [4] else 0           if ([2] <= [4]) {              /
+inc pc by [3]+1                           goto C;                    /
+set pc = 3  GOTO C                    }                              /
+[5] = [5] + 1                         [5] += 1;
+[3] = 1 if [5] > [4] else 0           if ([5] <= [4]) {
+inc pc by [3]+1
+set pc = 1+1  GOTO D                      goto D; }
+set pc = (pc * pc) + 1                exit()
+// Set up code below this
+A: [4] = [4] + 2                      [4] = 2
+[4] = [4] * [4]
+[4] = pc * [4]
+[4] = [4] * 11
+[3] = [3] + 3
+[3] = [3] * pc
+[3] = [3] + 4
+[4] = [4] + [3]
+inc pc by [0]+1
+set pc to 0+1  GOTO E
+[3] = pc
+[3] = [3] * pc
+[3] = pc + [3]
+[3] = pc * [3]
+[3] = [3] * 14
+[3] = [3] * pc
+[4] = [4] + [3]
+[0] = 0
+set pc to 0+1  GOTO E
+
+----------------------------------------------------------------------------------
+
+// Setup code, sets reg4 to a large value
+reg0 = 1;
+reg4 = 2;
+reg4 *= reg4;
+reg4 *= 19;
+reg4 *= 11;
+reg3 = 3;
+reg3 *= 22;
+reg3 += 4;
+reg4 += reg3;
+reg3 = 27;
+reg3 *= 28;
+reg3 += 29;
+reg3 *= 30;
+reg3 *= 14;
+reg3 *= 32;
+reg4 += reg3;
+reg0 = 0;
+
+// Main program loop. Goes through all numbers in 1 <= n <= reg4 and checks if they are factors.
+reg5 = 1;
+do {
+    reg2 = 1;
+    do {
+        reg3 = reg5 * reg2;
+        if (reg5 * reg2 == reg4) {      // If reg2 and reg5 are factors of reg4
+            reg0 += reg5;               // Add the value of reg5 to reg0
+        }
+        reg2 += 1;
+    } while (reg2 <= reg4);
+    reg5 += 1;
+} while (reg5 <= reg4);
+
+----------------------------------------------------------------------------------
+
+The program sums all factors of the large number that is created in the beginning.
+The sum is calculated in reg0 => the answer.
+
+The large number for the code above will be: 10551306
+
+Now, we can write a faster way to find all the factors:
+
+def find_factors(number: int):
+    factors = []
+
+    for n in range(1, number+1):
+        if number % n == 0:  # If we can divide evenly, it's a factor
+            factors.append(n)
+
+    return sum(factors
